@@ -1,13 +1,13 @@
 ---
 services:
     frontend:
-        container_name: mattutor-frontend
+        container_name: hypentor-frontend
         pull_policy: build
         build:
             context: ..
             dockerfile: docker/frontend.dockerfile
             target: frontend-prod
-        image: mattutor-frontend
+        image: hypentor-frontend
         ports:
             - 3000:3000
         environment:
