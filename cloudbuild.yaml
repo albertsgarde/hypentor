@@ -1,0 +1,16 @@
+---
+steps:
+    - name: 'gcr.io/cloud-builders/docker'
+      args: ['compose', '-f', 'docker/compose.yaml', 'build']
+    - name: 'gcr.io/cloud-builders/docker'
+      args: ['tag', 'hypentor-frontend', 'gcr.io/hypentor/hypentor-frontend']
+    - name: 'gcr.io/cloud-builders/docker'
+      args: ['push', 'gcr.io/hypentor/hypentor-frontend']
+    - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+      entrypoint: 'gcloud'
+      args: ['run', 'deploy', 'hypentor-cd', '--region=europe-west4', '--service-account=hypentor@hypentor.iam.gserviceaccount.com',
+          '--container=hypentor-frontend', '--image=gcr.io/hypentor/hypentor-frontend', '--port=3000',]
+logsBucket: 'gs://hypentor-logs'
+serviceAccount: 'projects/hypentor/serviceAccounts/hypentor@hypentor.iam.gserviceaccount.com'
+options:
+    logging: 'GCS_ONLY'
