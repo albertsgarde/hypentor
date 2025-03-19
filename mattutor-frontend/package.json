@@ -38,6 +38,7 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^0.482.0",
+		"@sveltejs/adapter-node": "^5.2.12",
 		"openai": "^4.87.3"
 	}
 }
