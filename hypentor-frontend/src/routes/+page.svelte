@@ -3,7 +3,6 @@
 	import { OpenAI } from 'openai';
 
 	interface Message {
-		id: number;
 		host: boolean;
 		name: string;
 		message: string;
@@ -13,7 +12,14 @@
 	let elemChat: HTMLElement;
 
 	// Messages
-	let messageFeed: Message[] = [];
+	let messageFeed: Message[] = [
+		{
+			host: false,
+			name: 'Tutor',
+			message: 'Hvad kan jeg hjælpe med?',
+			color: 'preset-tonal-primary'
+		}
+	];
 	let currentMessage = '';
 
 	let previousResponseId: string | null = null;
@@ -59,11 +65,11 @@
 	}
 
 	function addMessage() {
+		if (!currentMessage) return;
 		const userMessage = currentMessage;
 		currentMessage = '';
 
 		const newMessage = {
-			id: messageFeed.length,
 			host: true,
 			name: 'User',
 			message: userMessage,
@@ -79,7 +85,6 @@
 		getResponse(userMessage, previousResponseId).then(({ message, id }) => {
 			previousResponseId = id;
 			const newMessage = {
-				id: messageFeed.length,
 				host: false,
 				name: 'Tutor',
 				message: message,
@@ -100,55 +105,55 @@
 	}
 </script>
 
-<section class="card bg-surface-100-900 rounded-container overflow-hidden">
-	<div class="chat grid h-full w-full grid-cols-1 lg:grid-cols-[30%_1fr]">
-		<!-- Chat -->
-		<div class="grid-row-[1fr_auto] grid">
-			<!-- Conversation -->
-			<section bind:this={elemChat} class="max-h-[500px] space-y-4 overflow-y-auto p-4">
-				{#each messageFeed as bubble}
-					{#if bubble.host === true}
-						<div class="grid grid-cols-[auto_1fr] gap-2">
-							<div class="card preset-tonal space-y-2 rounded-tl-none p-4">
-								<header class="flex items-center justify-between">
-									<p class="font-bold">{bubble.name}</p>
-								</header>
-								<p>{bubble.message}</p>
-							</div>
+<!-- Body -->
+<div class="flex h-screen items-center justify-center bg-gray-100 p-4">
+	<!-- Main Chat Container -->
+	<div class="h-128 flex w-full max-w-md flex-col rounded-lg bg-white shadow-md">
+		<!-- Chat Header -->
+		<div class="rounded-t-lg bg-blue-600 p-4 text-white">
+			<h1 class="text-xl font-bold">Tutorbot</h1>
+		</div>
+		<!-- Chat Messages Container -->
+		<div bind:this={elemChat} class="flex-1 space-y-4 overflow-y-auto p-4">
+			{#each messageFeed as bubble}
+				{#if bubble.host === true}
+					<div class="flex flex-col items-end">
+						<span class="text-xs text-gray-500">
+							{bubble.name}
+						</span>
+						<div class="max-w-xs self-end rounded-lg rounded-tr-none bg-blue-500 p-3 text-white">
+							{bubble.message}
 						</div>
-					{:else}
-						<div class="grid grid-cols-[1fr_auto] gap-2">
-							<div class="card space-y-2 rounded-tr-none p-4 {bubble.color}">
-								<header class="flex items-center justify-between">
-									<p class="font-bold">{bubble.name}</p>
-								</header>
-								<p>{bubble.message}</p>
-							</div>
+					</div>
+				{:else}
+					<div class="flex flex-col">
+						<span class="text-xs text-gray-500">
+							{bubble.name}
+						</span>
+						<div class="max-w-xs self-start rounded-lg rounded-tl-none bg-gray-200 p-3">
+							{bubble.message}
 						</div>
-					{/if}
-				{/each}
-			</section>
-			<!-- Prompt -->
-			<section class="border-surface-200-800 border-t-[1px] p-4">
-				<div class="input-group">
-					<textarea
-						value={currentMessage}
-						oninput={(e) => (currentMessage = e.currentTarget.value)}
-						class="border-0 bg-transparent ring-0"
-						name="prompt"
-						id="prompt"
-						placeholder="Write a message..."
-						rows="1"
-						onkeydown={onPromptKeydown}
-					></textarea>
-					<button
-						class="input-group-cell {currentMessage ? 'preset-filled-primary-500' : 'preset-tonal'}"
-						onclick={addMessage}
-					>
-						<IconSend />
-					</button>
-				</div>
-			</section>
+					</div>
+				{/if}
+			{/each}
+		</div>
+		<!-- Chat Input Area -->
+		<div class="border-t p-4">
+			<div class="flex">
+				<input
+					bind:value={currentMessage}
+					type="text"
+					placeholder="Type your message..."
+					class="flex-1 rounded-l-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					onkeypress={onPromptKeydown}
+				/>
+				<button
+					class="rounded-r-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+					onclick={addMessage}
+				>
+					<IconSend />
+				</button>
+			</div>
 		</div>
 	</div>
-</section>
+</div>
